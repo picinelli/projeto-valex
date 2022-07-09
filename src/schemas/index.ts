@@ -9,3 +9,8 @@ export const cardActivationSchema = joi.object({
 export const cardTransactionsSchema = joi.object({
   id: joi.number().required(),
 })
+
+export const cardBlockSchema = joi.object({
+  id: joi.number().required(),
+  password: joi.string().required()
+})

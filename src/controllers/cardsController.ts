@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { cardActivationSchema, cardTransactionsSchema } from "../schemas/index.js";
+import { cardActivationSchema, cardBlockSchema } from "../schemas/index.js";
 import * as cardService from "../services/cardsService.js"
 import validateSchema from "../utils/schemaValidation.js";
 
@@ -21,4 +21,13 @@ export async function activateCard(req: Request, res: Response) {
   await cardService.activateCard(cardInfo)
 
   res.sendStatus(200)
+}
+
+export async function blockCard(req: Request, res: Response) {
+  const cardInfo: {id: number, password: string} = req.body
+  validateSchema(cardBlockSchema, cardInfo)
+
+  await cardService.blockCardById(cardInfo)
+  
+  res.send(cardInfo)
 }

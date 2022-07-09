@@ -65,6 +65,19 @@ export async function activateCard(cardInfo: {
   await cardRepository.update(card.id, {isBlocked: false, password: hashPassword})
 }
 
+export async function blockCardById(cardInfo: {id: number, password: string}) {
+  const {id, password} = cardInfo
+  const card = await cardRepository.findById(id)
+  if(!card) throwError("Card was not found!")
+  const isPasswordCorrect = bcrypt.compareSync(password, card.password)
+
+  if(isCardExpired(card.expirationDate)) throwError("This card is expired!")
+  if(card.isBlocked === true) throwError("This card is already blocked!")
+  if(!isPasswordCorrect) throwError("This password is incorrect!")
+
+  await cardRepository.update(id, {isBlocked: true})
+}
+
 //Utils and validation functions
 function validateInfo(
   company: companyRepository.Company,
