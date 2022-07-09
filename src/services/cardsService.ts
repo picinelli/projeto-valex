@@ -29,13 +29,14 @@ export async function createCard(
   const cardholderName = createUserCardName(user.fullName);
   const number = faker.finance.creditCardNumber("63[7-9]#-####-####-###L");
   const expirationDate = dayjs().add(5, "years").format("MM/YY");
-  const securityCode = cryptr.encrypt(faker.finance.creditCardCVV());
+  const securityCode = faker.finance.creditCardCVV()
+  const encryptedSecurityCode = cryptr.encrypt(securityCode)
 
   const cardInfo: cardRepository.CardInsertData = {
     employeeId: body.employeeId,
     number,
     cardholderName,
-    securityCode,
+    securityCode: encryptedSecurityCode,
     expirationDate,
     password: null,
     isVirtual: false,
@@ -43,7 +44,9 @@ export async function createCard(
     isBlocked: true,
     type: body.type,
   };
-  return await cardRepository.insert(cardInfo);
+
+  await cardRepository.insert(cardInfo);
+  return securityCode
 }
 
 export async function activateCard(cardInfo: {
@@ -52,9 +55,14 @@ export async function activateCard(cardInfo: {
   password: string;
 }) {
   const { id, securityCode, password } = cardInfo;
+  const saltRounds = 10
+  const hashPassword = bcrypt.hashSync(password, saltRounds);
 
   const card = await cardRepository.findById(id);
-  validateActivationCardInfo(card, securityCode, password);
+  if (!card) throwError("Card not identified!");
+
+  await validateActivationCardInfo(card, securityCode, password);
+  await cardRepository.update(card.id, {isBlocked: false, password: hashPassword})
 }
 
 //Utils and validation functions
@@ -63,24 +71,9 @@ function validateInfo(
   user: employeeRepository.Employee,
   cardType: cardRepository.Card
 ) {
-  if (!company) {
-    throw {
-      type: 404,
-      message: "Company not identified!",
-    };
-  }
-  if (!user) {
-    throw {
-      type: 404,
-      message: "User not identified!",
-    };
-  }
-  if (cardType) {
-    throw {
-      type: 400,
-      message: "Card Type already exists!",
-    };
-  }
+  if (!company) throwError("Company not identified!");
+  if (!user) throwError("User not identified!");
+  if (cardType) throwError("Card Type already exists!");
 }
 
 function createUserCardName(name: string) {
@@ -100,23 +93,21 @@ function createUserCardName(name: string) {
   return arr.join(" ");
 }
 
-function validateActivationCardInfo(
+async function validateActivationCardInfo(
   card: cardRepository.Card,
   securityCode: string,
   password: string
 ) {
+
   const cryptr = new Cryptr(process.env.CRYPTR_PASS);
   const decryptedCVC = cryptr.decrypt(card.securityCode);
   const numberedPass = +password
 
-  if (!card) throwError("Card not identified!");
   if (isCardExpired(card.expirationDate)) throwError("This card is expired!");
   if (card.password) throwError("This card is already activated!");
   if (decryptedCVC !== securityCode) throwError("Security code is incorrect!");
   if (password.length !== 4) throwError("Password size incorrect (4)");
   if(typeof(numberedPass) !== 'number') throwError("Password must be 4 numbers");
-
-  cardRepository.update(card.id, {isBlocked: false, password: password})
 }
 
 function isCardExpired(date: string) {

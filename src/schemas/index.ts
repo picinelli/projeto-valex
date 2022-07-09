@@ -5,3 +5,7 @@ export const cardActivationSchema = joi.object({
   securityCode: joi.number().required(),
   password: joi.string().required()
 })
+
+export const cardTransactionsSchema = joi.object({
+  id: joi.number().required(),
+})
