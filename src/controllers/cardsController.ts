@@ -20,7 +20,7 @@ export async function activateCard(req: Request, res: Response) {
 
   await cardService.activateCard(cardInfo)
 
-  res.sendStatus(200)
+  res.status(200).send("The card was activated successfully!")
 }
 
 export async function blockCard(req: Request, res: Response) {
@@ -29,5 +29,13 @@ export async function blockCard(req: Request, res: Response) {
 
   await cardService.blockCardById(cardInfo)
   
-  res.send(cardInfo)
+  res.status(200).send("The card was blocked successfully!")
+}
+
+export async function unblockCard(req: Request, res: Response) {
+  const cardInfo: {id: number, password: string} = req.body
+  validateSchema(cardBlockSchema, cardInfo)
+
+  await cardService.unblockCardById(cardInfo)
+  res.status(200).send("The card was unlocked successfully!")
 }
