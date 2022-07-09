@@ -1,15 +1,12 @@
 import { faker } from "@faker-js/faker";
 import dayjs from "dayjs";
 import Cryptr from "cryptr";
+import bcrypt from "bcrypt";
 
-import {
-  Card,
-  CardInsertData,
-  findByTypeAndEmployeeId,
-  insert,
-} from "../repositories/cardRepository.js";
-import { Company, findByApiKey } from "../repositories/companyRepository.js";
-import { Employee, findById } from "../repositories/employeeRepository.js";
+import * as cardRepository from "../repositories/cardRepository.js";
+import * as companyRepository from "../repositories/companyRepository.js";
+import * as employeeRepository from "../repositories/employeeRepository.js";
+import throwError from "../utils/throwError.js";
 
 export async function createCard(
   body: {
@@ -18,9 +15,12 @@ export async function createCard(
   },
   API: string
 ) {
-  const company = await findByApiKey(API);
-  const user = await findById(body.employeeId);
-  const cardType = await findByTypeAndEmployeeId(body.type, body.employeeId);
+  const company = await companyRepository.findByApiKey(API);
+  const user = await employeeRepository.findById(body.employeeId);
+  const cardType = await cardRepository.findByTypeAndEmployeeId(
+    body.type,
+    body.employeeId
+  );
 
   const cryptr = new Cryptr(process.env.CRYPTR_PASS);
 
@@ -31,7 +31,7 @@ export async function createCard(
   const expirationDate = dayjs().add(5, "years").format("MM/YY");
   const securityCode = cryptr.encrypt(faker.finance.creditCardCVV());
 
-  const cardInfo: CardInsertData = {
+  const cardInfo: cardRepository.CardInsertData = {
     employeeId: body.employeeId,
     number,
     cardholderName,
@@ -43,10 +43,26 @@ export async function createCard(
     isBlocked: true,
     type: body.type,
   };
-  return await insert(cardInfo);
+  return await cardRepository.insert(cardInfo);
 }
 
-function validateInfo(company: Company, user: Employee, cardType: Card) {
+export async function activateCard(cardInfo: {
+  id: number;
+  securityCode: string;
+  password: string;
+}) {
+  const { id, securityCode, password } = cardInfo;
+
+  const card = await cardRepository.findById(id);
+  validateActivationCardInfo(card, securityCode, password);
+}
+
+//Utils and validation functions
+function validateInfo(
+  company: companyRepository.Company,
+  user: employeeRepository.Employee,
+  cardType: cardRepository.Card
+) {
   if (!company) {
     throw {
       type: 404,
@@ -82,4 +98,33 @@ function createUserCardName(name: string) {
     }
   }
   return arr.join(" ");
+}
+
+function validateActivationCardInfo(
+  card: cardRepository.Card,
+  securityCode: string,
+  password: string
+) {
+  const cryptr = new Cryptr(process.env.CRYPTR_PASS);
+  const decryptedCVC = cryptr.decrypt(card.securityCode);
+  const numberedPass = +password
+
+  if (!card) throwError("Card not identified!");
+  if (isCardExpired(card.expirationDate)) throwError("This card is expired!");
+  if (card.password) throwError("This card is already activated!");
+  if (decryptedCVC !== securityCode) throwError("Security code is incorrect!");
+  if (password.length !== 4) throwError("Password size incorrect (4)");
+  if(typeof(numberedPass) !== 'number') throwError("Password must be 4 numbers");
+
+  cardRepository.update(card.id, {isBlocked: false, password: password})
+}
+
+function isCardExpired(date: string) {
+  const month = parseInt(date.split("/")[0]);
+  const year = parseInt(date.split("/")[1]) + 2000;
+  const expirationDate = new Date(year, month);
+  const now = new Date();
+
+  if (now >= expirationDate) return true;
+  return false;
 }
