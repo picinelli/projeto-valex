@@ -7,6 +7,7 @@ import * as cardRepository from "../repositories/cardRepository.js";
 import * as companyRepository from "../repositories/companyRepository.js";
 import * as employeeRepository from "../repositories/employeeRepository.js";
 import throwError from "../utils/throwError.js";
+import isCardExpired from "../utils/checkCardExpiration.js";
 
 export async function createCard(
   body: {
@@ -134,14 +135,4 @@ async function validateActivationCardInfo(
   if (decryptedCVC !== securityCode) throwError("Security code is incorrect!");
   if (password.length !== 4) throwError("Password size incorrect (4)");
   if(typeof(numberedPass) !== 'number') throwError("Password must be 4 numbers");
-}
-
-function isCardExpired(date: string) {
-  const month = parseInt(date.split("/")[0]);
-  const year = parseInt(date.split("/")[1]) + 2000;
-  const expirationDate = new Date(year, month);
-  const now = new Date();
-
-  if (now >= expirationDate) return true;
-  return false;
 }

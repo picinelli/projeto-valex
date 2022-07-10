@@ -7,7 +7,9 @@ export async function getBalanceAndTransactions(id: string) {
   const cardId = parseInt(id)
   const transactions = await paymentRepository.findByCardId(cardId)
   const recharges = await rechargeRepository.findByCardId(cardId)
+  const card = await cardRepository.findById(cardId)
 
+  if(!card) throwError("Card was not found!")
   if(!transactions) throwError("Error on fetch transactions")
   if(!recharges) throwError("Error on fetch recharges")
 
