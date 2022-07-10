@@ -26,3 +26,12 @@ export const paymentSchema = joi.object({
   businessId: joi.number().required(),
   amount: joi.number().required()
 })
+
+export const paymentOnlineSchema = joi.object({
+  number: joi.string().required(),
+  cardholderName: joi.string().required(),
+  expirationDate: joi.string().required(),
+  securityCode: joi.string().required(),
+  businessId: joi.number().required(),
+  amount: joi.number().required(),
+})
