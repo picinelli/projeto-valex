@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { cardActivationSchema, cardBlockSchema } from "../schemas/index.js";
+import { cardActivationSchema, cardBlockSchema, cardDeleteSchema, virtualCardCreationSchema } from "../schemas/index.js";
 import * as cardService from "../services/cardsService.js"
 import validateSchema from "../utils/schemaValidation.js";
 
@@ -12,6 +12,28 @@ export async function createCard(req: Request, res: Response) {
 
   const securityCode = await cardService.createCard(body, API)
   res.status(201).send(securityCode)
+}
+
+export async function createVirtualCard(req: Request, res: Response) {
+  const body: {
+    originalCardId: number,
+    password: string
+  } = req.body;
+
+  validateSchema(virtualCardCreationSchema, body)
+
+  const securityCode = await cardService.createVirtualCard(body)
+
+  res.status(201).send(securityCode)
+}
+
+export async function deleteVirtualCard(req: Request, res: Response) {
+  const cardInfo: {id: number, password: string} = req.body
+  validateSchema(cardDeleteSchema, cardInfo)
+
+  await cardService.deleteCard(cardInfo)
+
+  res.status(200).send("The card was deleted successfully!")
 }
 
 export async function activateCard(req: Request, res: Response) {

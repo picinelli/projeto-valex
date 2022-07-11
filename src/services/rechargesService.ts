@@ -9,6 +9,7 @@ export async function rechargeCard(rechargeInfo: {cardId: number, amount: number
 
   if(amount < 1) throwError("Insert a minimum amount of 1")
   if(!card) throwError("Card was not found!")
+  if(card.originalCardId) throwError("You cannot recharge a virtual card")
   if(!card.password) throwError("You must activate your card")
   if(isCardExpired(card.expirationDate)) throwError("Your card is expired")
 

@@ -35,3 +35,13 @@ export const paymentOnlineSchema = joi.object({
   businessId: joi.number().required(),
   amount: joi.number().required(),
 })
+
+export const virtualCardCreationSchema = joi.object({
+  originalCardId: joi.number().required(),
+  password: joi.string().required()
+})
+
+export const cardDeleteSchema = joi.object({
+  id: joi.number().required(),
+  password: joi.string().required()
+})

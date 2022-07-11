@@ -50,6 +50,58 @@ export async function createCard(
   return securityCode
 }
 
+export async function createVirtualCard(
+  body: {
+    originalCardId: number,
+    password: string
+  },
+
+) {
+  const {password, originalCardId} = body
+  const originalCard = await cardRepository.findById(originalCardId)
+  const cryptr = new Cryptr(process.env.CRYPTR_PASS);
+  const number = faker.finance.creditCardNumber("63[7-9]#-####-####-###L");
+  const expirationDate = dayjs().add(5, "years").format("MM/YY");
+  const securityCode = faker.finance.creditCardCVV()
+  const encryptedSecurityCode = cryptr.encrypt(securityCode)
+
+  if(!originalCard) throwError("Original card was not found!")
+  const isPasswordCorrect = bcrypt.compareSync(password, originalCard.password)
+  if(!isPasswordCorrect) throwError("This password is incorrect!")
+
+  const cardInfo: cardRepository.CardInsertData = {
+    employeeId: originalCard.employeeId,
+    number,
+    cardholderName: originalCard.cardholderName,
+    securityCode: encryptedSecurityCode,
+    expirationDate,
+    password: originalCard.password,
+    isVirtual: true,
+    originalCardId,
+    isBlocked: false,
+    type: originalCard.type
+  };
+
+  await cardRepository.insert(cardInfo);
+
+  return securityCode
+}
+
+export async function deleteCard(cardInfo: {
+  id: number,
+  password: string
+}) {
+  const { id, password } = cardInfo;
+
+  const card = await cardRepository.findById(id);
+  if (!card) throwError("Card not identified!");
+  if (!card.originalCardId) throwError("This is not a virtual card!")
+  const isPasswordCorrect = bcrypt.compareSync(password, card.password)
+  if(!isPasswordCorrect) throwError("This password is incorrect!")
+
+  await cardRepository.remove(id)
+}
+
 export async function activateCard(cardInfo: {
   id: number;
   securityCode: string;
@@ -61,6 +113,7 @@ export async function activateCard(cardInfo: {
 
   const card = await cardRepository.findById(id);
   if (!card) throwError("Card not identified!");
+  if (card.originalCardId) throwError("You cannot activate a virtual card")
 
   await validateActivationCardInfo(card, securityCode, password);
   await cardRepository.update(card.id, {isBlocked: false, password: hashPassword})

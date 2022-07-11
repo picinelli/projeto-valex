@@ -16,6 +16,7 @@ export async function paymentTransaction(paymentInfo: {
   const { cardId, password, businessId, amount } = paymentInfo;
   const card = await cardRepository.findById(cardId);
   if (!card) return throwError("Card was not found!");
+  if (card.originalCardId) throwError("You cannot use a virtual card on a POS")
   const business = await businessRepository.findById(businessId);
   const cardTransactions = await employeesService.getBalanceAndTransactions(
     cardId.toString()
@@ -41,9 +42,10 @@ export async function paymentOnlineTransaction(paymentInfo: {
   const {number, cardholderName, expirationDate, securityCode, businessId, amount} = paymentInfo;
   const card = await cardRepository.findByCardDetails(number, cardholderName, expirationDate);
   if (!card) return throwError("Card was not found!");
+  const cardAssigned = card.originalCardId ? card.originalCardId : card.id
 
   const business = await businessRepository.findById(businessId);
-  const cardTransactions = await employeesService.getBalanceAndTransactions(card.id.toString());
+  const cardTransactions = await employeesService.getBalanceAndTransactions(cardAssigned.toString());
 
   validateBasicInfo(amount, cardTransactions, card, business);
 
@@ -58,7 +60,7 @@ export async function paymentOnlineTransaction(paymentInfo: {
   const decryptedCVC = cryptr.decrypt(card.securityCode);
   if (decryptedCVC !== securityCode) throwError("Security code is incorrect!");
 
-  await paymentRepository.insert({ cardId: card.id, businessId, amount });
+  await paymentRepository.insert({ cardId: cardAssigned, businessId, amount });
 
 }
 
