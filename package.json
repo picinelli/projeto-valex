@@ -1,9 +1,11 @@
 {
   "name": "projeto18-valex",
   "version": "1.0.0",
-  "main": "src/index.ts",
+  "main": "index.js",
   "type": "module",
   "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
     "dev": "nodemon src/index.ts"
   },
   "author": "",
