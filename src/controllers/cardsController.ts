@@ -11,6 +11,7 @@ export async function createCard(req: Request, res: Response) {
   } = req.body;
 
   const securityCode = await cardService.createCard(body, API)
+  
   res.status(201).send(securityCode)
 }
 

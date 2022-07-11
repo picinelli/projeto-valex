@@ -47,6 +47,7 @@ export async function createCard(
   };
 
   await cardRepository.insert(cardInfo);
+  
   return securityCode
 }
 
