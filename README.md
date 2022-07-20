@@ -21,7 +21,6 @@
 Rotas:
 
 ```
-    <hr/>
     
   - POST /create-card
     - Rota para a empresa cadastrar um cartão novo para um empregado
@@ -32,7 +31,6 @@ Rotas:
         "employeeId": number,
         "type": "groceries" | "restaurant" | "transport" | "education" | "health"
     }
-    <hr/>
 
  - POST /create-virtual-card
     - Rota para a empresa cadastrar um cartão virtual novo para um empregado
@@ -40,7 +38,6 @@ Rotas:
     	"originalCardId": number,
     	"password": string
     } 
-    <hr/>
     
  - POST /delete-virtual-card
     - Rota para a empresa cadastrar um cartão virtual novo para um empregado
@@ -48,7 +45,6 @@ Rotas:
     	"id": number,
     	"password": string
     }
-    <hr/>
     
 - POST /activate-card
     - Rota para o(a) empregado(a) ativar um cartão
@@ -57,7 +53,6 @@ Rotas:
         "securityCode": string,
         "password": string
     }
-    <hr/>
     
 - POST /recharge-card
     - Rota para a empresa recarregar o cartão de um(a) empregado(a)
@@ -65,7 +60,6 @@ Rotas:
         "cardId": number,
         "amount": number
     }
-    <hr/>
     
 - POST /buy
     - Rota para o(a) empregado(a) fazer uma compra usando um cartão
@@ -75,14 +69,12 @@ Rotas:
         "amount": 10000,
         "businessId": 1
     }
-    <hr/>
     
 - GET /transactions-card
     - Rota para o(a) empregado(a) acessar saldo atual e histórico de recarga e uso do cartão
     - headers: {
 	"id": string
     }
-    <hr/>
     
 - POST /block-card
     - Rota para o(a) empregado(a) bloquear um cartão
@@ -90,7 +82,6 @@ Rotas:
         "id": number,
         "password": string
     }
-    <hr/>
     
 - POST /unblock-card
     - Rota para o(a) empregado(a) bloquear um cartão
@@ -98,7 +89,6 @@ Rotas:
         "id": number,
         "password": string
     }
-    <hr/>
     
 - POST /payment
     - Rota para lançar os pagamentos efetuados pelo cartão
@@ -108,7 +98,6 @@ Rotas:
 	"businessId": number,
         "amount": number
     }
-    <hr/>
     
 - POST /payment-online
     - Rota para lançar os pagamentos efetuados pelo cartão virtual
@@ -120,7 +109,6 @@ Rotas:
 	"businessId": number,
         "amount": number
     }
-    <hr/>
 ```
 
 
