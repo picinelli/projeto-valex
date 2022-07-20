@@ -18,6 +18,88 @@
 
 <!-- ABOUT THE PROJECT -->
 
+API:
+
+```
+- POST /create-card
+    - Rota para a empresa cadastrar um cartão novo para um empregado
+    - headers: {
+        "x-api-key": "string"
+    }
+    - body: {
+        "employeeId": number,
+        "type": "groceries" | "restaurant" | "transport" | "education" | "health"
+    }
+ - POST /create-virtual-card
+    - Rota para a empresa cadastrar um cartão virtual novo para um empregado
+    - body: {
+    	"originalCardId": number,
+    	"password": string
+    }
+ - POST /delete-virtual-card
+    - Rota para a empresa cadastrar um cartão virtual novo para um empregado
+    - body: {
+    	"id": number,
+    	"password": string
+    }
+- POST /activate-card
+    - Rota para o(a) empregado(a) ativar um cartão
+    - body: {
+        "id": number,
+        "securityCode": string,
+        "password": string
+    }
+- POST /recharge-card
+    - Rota para a empresa recarregar o cartão de um(a) empregado(a)
+    - body: {
+        "cardId": number,
+        "amount": number
+    }
+- POST /buy
+    - Rota para o(a) empregado(a) fazer uma compra usando um cartão
+    - body: {
+        "cardId": 1,
+        "password": "1234",
+        "amount": 10000,
+        "businessId": 1
+    }
+- GET /transactions-card
+    - Rota para o(a) empregado(a) acessar saldo atual e histórico de recarga e uso do cartão
+    - headers: {
+	"id": string
+    }
+- PUT /block-card
+    - Rota para o(a) empregado(a) bloquear um cartão
+    - body: {
+        "id": number,
+        "password": string
+    }
+- PUT /unblock-card
+    - Rota para o(a) empregado(a) bloquear um cartão
+    - body: {
+        "id": number,
+        "password": string
+    }
+- POST /payment
+    - Rota para lançar os pagamentos efetuados pelo cartão
+    - body: {
+        "cardId": number,
+        "password": string,
+	"businessId": number,
+        "amount": number
+    }
+- POST /payment-online
+    - Rota para lançar os pagamentos efetuados pelo cartão virtual
+    - body: {
+        "number": number,
+        "cardholderName": string,
+        "expirationDate": string,
+        "securityCode": string,
+	"businessId": number,
+        "amount": number
+    }
+```
+
 
 ### Tecnologias Utilizadas
 
