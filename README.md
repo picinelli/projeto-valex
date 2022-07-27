@@ -21,7 +21,7 @@
 - [Introdução](#introdução)
 - [Instalação](#instalação)
 - [Rotas](#rotas)
-- [Tecnologias Utilizadas](#tecnologias)
+- [Tecnologias Utilizadas](#Tecnologias)
 - [Contato](#contato)
 
 ## Introdução
