@@ -16,115 +16,156 @@
     <a href="https://github.com/picinelli/projeto-valex/tree/main/src"><strong>Código TS»</strong></a>
 </div>
 
-<!-- ABOUT THE PROJECT -->
+## Sumário
 
-Rotas:
+- [Introdução](#introdução)
+- [Instalação](#instalação)
+- [Rotas](#rotas)
+- [Tecnologias Utilizadas](#tecnologias)
+- [Contato](#contato)
+
+## Introdução
+
+Uma API de cartões de benefícios. A API será responsável pela criação, recarga, ativação, assim como o processamento das compras.
+
+## Instalação
 
 ```
-    
-  - POST /create-card
-    - Rota para a empresa cadastrar um cartão novo para um empregado
-    - headers: {
-        "x-api-key": "string"
-    }
-    - body: {
-        "employeeId": number,
-        "type": "groceries" | "restaurant" | "transport" | "education" | "health"
-    }
+git clone https://github.com/picinelli/projeto-shortly.git
 
- - POST /create-virtual-card
-    - Rota para a empresa cadastrar um cartão virtual novo para um empregado
-    - body: {
-    	"originalCardId": number,
-    	"password": string
-    } 
-    
- - POST /delete-virtual-card
-    - Rota para a empresa cadastrar um cartão virtual novo para um empregado
-    - body: {
-    	"id": number,
-    	"password": string
-    }
-    
-- POST /activate-card
-    - Rota para o(a) empregado(a) ativar um cartão
-    - body: {
-        "id": number,
-        "securityCode": string,
-        "password": string
-    }
-    
-- POST /recharge-card
-    - Rota para a empresa recarregar o cartão de um(a) empregado(a)
-    - body: {
-        "cardId": number,
-        "amount": number
-    }
-    
-- POST /buy
-    - Rota para o(a) empregado(a) fazer uma compra usando um cartão
-    - body: {
-        "cardId": 1,
-        "password": "1234",
-        "amount": 10000,
-        "businessId": 1
-    }
-    
-- GET /transactions-card
-    - Rota para o(a) empregado(a) acessar saldo atual e histórico de recarga e uso do cartão
-    - headers: {
-	"id": string
-    }
-    
-- POST /block-card
-    - Rota para o(a) empregado(a) bloquear um cartão
-    - body: {
-        "id": number,
-        "password": string
-    }
-    
-- POST /unblock-card
-    - Rota para o(a) empregado(a) bloquear um cartão
-    - body: {
-        "id": number,
-        "password": string
-    }
-    
-- POST /payment
-    - Rota para lançar os pagamentos efetuados pelo cartão
-    - body: {
-        "cardId": number,
-        "password": string,
-	"businessId": number,
-        "amount": number
-    }
-    
-- POST /payment-online
-    - Rota para lançar os pagamentos efetuados pelo cartão virtual
-    - body: {
-        "number": number,
-        "cardholderName": string,
-        "expirationDate": string,
-        "securityCode": string,
-	"businessId": number,
-        "amount": number
-    }
+npm install
+
+change start script on package.json to: "start": "node src/server.js",
+
+npm start
+
 ```
 
+## Rotas
 
-### Tecnologias Utilizadas
+- **POST /create-card** </br>
+  **Esta é uma rota autenticada** </br>
+  Deve receber um corpo (body) no formato seguinte e criar o cartão 
+  ```
+  {
+    employeeId: number,
+    type: "groceries" | "restaurant" | "transport" | "education" | "health"
+  }
+	```
+  Deve responder um corpo (body) com o CVV do cartão.
 
+- **POST /create-virtual-card** </br>
+  Esta não é uma rota autenticada. </br>
+  Deve receber um corpo (body) no formato seguinte e criar o cartão virtual 
+  ```
+  {
+    originalCardId: number,
+    password: string
+  }
+	```
+  Deve responder um corpo (body) com o CVV do cartão.
+  
+- **POST /delete-virtual-card** </br>
+  Esta não é uma rota autenticada. </br>
+  Deve receber um corpo (body) no formato seguinte e deletar o cartão virtual 
+  ```
+  {
+    id: number,
+    password: string
+  }
+	```
+
+- **POST /activate-card** </br>
+  Esta não é uma rota autenticada. </br>
+  Deve receber um corpo (body) no formato seguinte e ativar o cartão 
+  ```
+  {
+    id: number,
+    securityCode: string,
+    password: string
+  }
+	```
+	
+- **POST /block-card** </br>
+  Esta não é uma rota autenticada. </br>
+  Deve receber um corpo (body) no formato seguinte e bloquear o cartão 
+  ```
+  {
+    id: number,
+    password: string
+  }
+	```
+	
+- **POST /unblock-card** </br>
+  Esta não é uma rota autenticada. </br>
+  Deve receber um corpo (body) no formato seguinte e desbloquear o cartão 
+  ```
+  {
+    id: number,
+    password: string
+  }
+	```
+	
+- **POST /payment** </br>
+  Esta não é uma rota autenticada. </br>
+  Deve receber um corpo (body) no formato seguinte e armazenar o valor do pagamento 
+  ```
+  {
+    cardId: number,
+    password: string,
+    businessId: number,
+    amount: number
+  }
+	```
+	
+- **POST /payment-online** </br>
+  Esta não é uma rota autenticada. </br>
+  Deve receber um corpo (body) no formato seguinte e armazenar o valor do pagamento (online)
+  ```
+  {
+    number: string,
+    cardholderName: string,
+    expirationDate: string,
+    securityCode: string,
+    businessId: number,
+    amount: number
+  }
+	```
+	
+- **POST /recharge-card** </br>
+  Esta não é uma rota autenticada. </br>
+  Deve receber um corpo (body) no formato seguinte e armazenar o valor da recarga
+  ```
+  {
+    cardId: number,
+    amount: number
+  }
+	```
+	
+- **GET /transactions-card** </br>
+  Esta não é uma rota autenticada. </br>
+  Deve responder um corpo (body) no formato seguinte
+  ```
+  {
+    balance: number,
+    transactions: [...],
+    recharges: [...]
+  }
+	```
+
+
+## Tecnologias Utilizadas
+ 
 ![Nodejs](https://img.shields.io/badge/Node.js-43853D?style=for-the-badge&logo=node.js&logoColor=white)
 ![ExpressJS](https://img.shields.io/badge/Express.js-404D59?style=for-the-badge)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)
 ![Git](https://img.shields.io/badge/git-%23F05033.svg?style=for-the-badge&logo=git&logoColor=white)
-![Heroku](https://img.shields.io/badge/Heroku-430098?style=for-the-badge&logo=heroku&logoColor=white)
 ![Visual Studio Code](https://img.shields.io/badge/Visual%20Studio%20Code-0078d7.svg?style=for-the-badge&logo=visual-studio-code&logoColor=white)
 
 <!-- CONTACT -->
 
-### Contato
+## Contato
 
 [![LinkedIn][linkedin-shield]][linkedin-url]
 [![Mail][mail-shield]][mail-url]
